@@ -3,7 +3,6 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import { Environment } from "@react-three/drei";
-import { useRouter } from "next/navigation";
 import { CabinetRing } from "./CabinetRing";
 import { NeonLighting } from "./NeonLighting";
 import { RetroGrid } from "./RetroGrid";
@@ -13,10 +12,15 @@ import { ArcadeHUD } from "@/components/ui/ArcadeHUD";
 import { useCarousel } from "@/hooks/useCarousel";
 import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 import { usePerformanceTier, getStarCount } from "@/hooks/usePerformanceTier";
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
+import type { CabinetConfig } from "@/lib/cabinets";
 
-export function ArcadeScene() {
-  const router = useRouter();
+interface ArcadeSceneProps {
+  onZoomedIn?: (cabinet: CabinetConfig) => void;
+  overlayActive: boolean;
+}
+
+export function ArcadeScene({ onZoomedIn, overlayActive }: ArcadeSceneProps) {
   const tier = usePerformanceTier();
   const {
     activeIndex,
@@ -25,10 +29,12 @@ export function ArcadeScene() {
     zoomTarget,
     currentZoom,
     isZooming,
+    isZoomedIn,
     rotateNext,
     rotatePrev,
     rotateTo,
     enterCabinet,
+    exitCabinet,
     activeCabinet,
   } = useCarousel();
 
@@ -39,16 +45,25 @@ export function ArcadeScene() {
 
   const handleEnter = useCallback(async () => {
     await enterCabinet();
-    router.push(activeCabinet.route);
-  }, [enterCabinet, router, activeCabinet.route]);
+    history.replaceState(null, "", activeCabinet.route);
+    onZoomedIn?.(activeCabinet);
+  }, [enterCabinet, activeCabinet, onZoomedIn]);
+
+  const prevOverlayActive = useRef(false);
+  useEffect(() => {
+    if (prevOverlayActive.current && !overlayActive) {
+      exitCabinet();
+    }
+    prevOverlayActive.current = overlayActive;
+  }, [overlayActive, exitCabinet]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") handleEnter();
+      if (e.key === "Enter" && !isZoomedIn) handleEnter();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleEnter]);
+  }, [handleEnter, isZoomedIn]);
 
   return (
     <>

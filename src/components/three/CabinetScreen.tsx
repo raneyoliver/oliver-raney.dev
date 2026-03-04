@@ -2,22 +2,26 @@
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Text, useTexture } from "@react-three/drei";
+import { Text, Html, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { CabinetConfig } from "@/lib/cabinets";
+import { AboutContent } from "@/components/content/AboutContent";
+import { ProjectsContent } from "@/components/content/ProjectsContent";
+import { ResumeContent } from "@/components/content/ResumeContent";
+import { ContactContent } from "@/components/content/ContactContent";
+import { BlogContent } from "@/components/content/BlogContent";
+import { SkillsContent } from "@/components/content/SkillsContent";
 
 interface CabinetScreenProps {
   config: CabinetConfig;
   isActive: boolean;
 }
 
-// Screen surface: position, dimensions, and tilt (radians, negative = top tilts backward)
 const SCREEN_POS: [number, number, number] = [0, 0.64, -.11];
 const SCREEN_TILT = -0.254;
 const SW = 1.005;
 const SH = 1.096;
 
-// Marquee surface: position, dimensions, and tilt
 const MARQUEE_POS: [number, number, number] = [0, 1.22, 0.094];
 const MARQUEE_TILT = -0.203;
 const MW = 1;
@@ -25,11 +29,18 @@ const MH = 0.245;
 
 const FONT = "/fonts/PressStart2P-Regular.ttf";
 
-// Controls surface: position, dimensions, and tilt
-const CONTROLS_POS: [number, number, number] =  [0, 0.057, .05];
+const CONTROLS_POS: [number, number, number] = [0, 0.057, .05];
 const CONTROLS_TILT = -1.404;
 const CW = 1;
 const CH = 0.9;
+
+// Drei Html transform mode uses factor = 400 / (distanceFactor || 10) = 40.
+// A CSS pixel maps to (groupScale / factor) world units.
+// For W pixels to span SW world units: scale = SW * factor / W
+const DREI_FACTOR = 40;
+const HTML_PX_W = typeof window !== "undefined" ? window.innerWidth : 1920;
+const HTML_PX_H = typeof window !== "undefined" ? window.innerHeight : 1080;
+const HTML_SCALE = (SW * DREI_FACTOR) / HTML_PX_W;
 
 function ScreenBackdrop({ color, isActive }: { color: string; isActive: boolean }) {
   const glowRef = useRef<THREE.Mesh>(null);
@@ -87,128 +98,50 @@ function ControlsBackdrop({ color }: { color: string }) {
   );
 }
 
-function Blink({ children, position, fontSize, color, rate = 3 }: {
-  children: string; position: [number, number, number]; fontSize: number; color: string; rate?: number;
-}) {
-  const ref = useRef<THREE.Object3D>(null);
-  useFrame(({ clock }) => { if (ref.current) ref.current.visible = Math.sin(clock.elapsedTime * rate) > 0; });
-  return <Text ref={ref} position={position} fontSize={fontSize} color={color} font={FONT} anchorX="center" anchorY="middle" maxWidth={SW * 0.9}>{children}</Text>;
-}
+function ScreenContent({ config }: { config: CabinetConfig }) {
+  const contentMap: Record<string, React.ReactNode> = {
+    about: <AboutContent color={config.color} />,
+    projects: <ProjectsContent color={config.color} />,
+    resume: <ResumeContent color={config.color} />,
+    contact: <ContactContent color={config.color} />,
+    blog: <BlogContent color={config.color} />,
+    skills: <SkillsContent color={config.color} />,
+  };
 
-function Enter({ active }: { active: boolean }) {
-  if (!active) return null;
-  return <Blink position={[0, -SH * 0.42, 0]} fontSize={0.022} color="#ffffff" rate={2}>PRESS ENTER</Blink>;
-}
-
-function AboutScreen({ color, active }: { color: string; active: boolean }) {
   return (
-    <group>
-      <Text position={[0, 0.08, 0]} fontSize={0.035} color={color} font={FONT} anchorX="center" anchorY="middle">PLAYER 1</Text>
-      <Blink position={[0, 0.01, 0]} fontSize={0.045} color={color}>READY</Blink>
-      <Enter active={active} />
-    </group>
-  );
-}
-
-function ProjectsScreen({ color, active }: { color: string; active: boolean }) {
-  const grp = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => {
-    if (grp.current && active) {
-      grp.current.children.forEach((c, i) => {
-        if (c instanceof THREE.Mesh) c.scale.setY(0.7 + Math.sin(clock.elapsedTime * 2 + i * 0.8) * 0.3);
-      });
-    }
-  });
-  const bars = [0.08, 0.12, 0.06, 0.10, 0.09];
-  return (
-    <group>
-      <Text position={[0, 0.10, 0]} fontSize={0.032} color={color} font={FONT} anchorX="center" anchorY="middle">PORTFOLIO</Text>
-      <group ref={grp}>
-        {bars.map((h, i) => (
-          <mesh key={i} position={[-0.12 + i * 0.06, -0.02 + h / 2, 0]}>
-            <boxGeometry args={[0.04, h, 0.001]} />
-            <meshBasicMaterial color={color} transparent opacity={0.85} />
-          </mesh>
-        ))}
-      </group>
-      <Enter active={active} />
-    </group>
-  );
-}
-
-function ResumeScreen({ color, active }: { color: string; active: boolean }) {
-  const cur = useRef<THREE.Object3D>(null);
-  useFrame(({ clock }) => { if (cur.current) cur.current.visible = Math.sin(clock.elapsedTime * 4) > 0; });
-  return (
-    <group>
-      <Text position={[0, 0.06, 0]} fontSize={0.022} color={color} font={FONT} anchorX="center" anchorY="middle" maxWidth={SW * 0.9} lineHeight={2.2}>
-        {"> LOADING XP...\n> SKILLS: ████░░\n> LVL: MAX"}
-      </Text>
-      <Text ref={cur} position={[0.14, -0.05, 0]} fontSize={0.028} color={color} font={FONT} anchorX="center" anchorY="middle">_</Text>
-      <Enter active={active} />
-    </group>
-  );
-}
-
-function ContactScreen({ color, active }: { color: string; active: boolean }) {
-  return (
-    <group>
-      <Text position={[0, 0.06, 0]} fontSize={0.065} color={color} font={FONT} anchorX="center" anchorY="middle">@</Text>
-      <Blink position={[0, -0.04, 0]} fontSize={0.032} color={color}>SEND MSG</Blink>
-      <Enter active={active} />
-    </group>
-  );
-}
-
-function BlogScreen({ color, active }: { color: string; active: boolean }) {
-  const txt = useRef<THREE.Object3D>(null);
-  useFrame(({ clock }) => {
-    if (txt.current) { const t = (clock.elapsedTime * 0.03) % 1; txt.current.position.y = 0.12 - t * 0.28; }
-  });
-  return (
-    <group>
-      <Text ref={txt} position={[0, 0.06, 0]} fontSize={0.020} color={color} font={FONT} anchorX="center" anchorY="middle" maxWidth={SW * 0.9} lineHeight={2.0}>
-        {"> NEW POST\n> THOUGHTS.EXE\n> BLOG ACTIVE\n> STATUS: WRITING"}
-      </Text>
-      <Enter active={active} />
-    </group>
-  );
-}
-
-function SkillsScreen({ color, active }: { color: string; active: boolean }) {
-  const skills = ["REACT", "THREE", "TS"];
-  const widths = [0.30, 0.26, 0.22];
-  return (
-    <group>
-      {skills.map((skill, i) => (
-        <group key={skill}>
-          <Text position={[-0.16, 0.10 - i * 0.08, 0]} fontSize={0.018} color={color} font={FONT} anchorX="left" anchorY="middle">{skill}</Text>
-          <mesh position={[-0.16 + widths[i] / 2, 0.06 - i * 0.08, 0]}>
-            <planeGeometry args={[widths[i], 0.025]} />
-            <meshBasicMaterial color={color} transparent opacity={0.75} />
-          </mesh>
-        </group>
-      ))}
-      <Enter active={active} />
-    </group>
+    <Html
+      transform
+      position={[0, 0, 0.01]}
+      scale={HTML_SCALE}
+      center
+      zIndexRange={[0, 0]}
+    >
+      <div
+        style={{
+          width: HTML_PX_W,
+          height: HTML_PX_H,
+          overflow: "hidden",
+          background: "#0a0014",
+          color: "#ededed",
+          padding: "12px",
+          boxSizing: "border-box",
+          pointerEvents: "none",
+        }}
+      >
+        {contentMap[config.id]}
+      </div>
+    </Html>
   );
 }
 
 export function CabinetScreen({ config, isActive }: CabinetScreenProps) {
   return (
     <group>
-      {/* Screen overlay - positioned and tilted to match the cabinet's CRT surface */}
       <group position={SCREEN_POS} rotation={[SCREEN_TILT, 0, 0]}>
         <ScreenBackdrop color={config.color} isActive={isActive} />
-        {config.id === "about" && <AboutScreen color={config.color} active={isActive} />}
-        {config.id === "projects" && <ProjectsScreen color={config.color} active={isActive} />}
-        {config.id === "resume" && <ResumeScreen color={config.color} active={isActive} />}
-        {config.id === "contact" && <ContactScreen color={config.color} active={isActive} />}
-        {config.id === "blog" && <BlogScreen color={config.color} active={isActive} />}
-        {config.id === "skills" && <SkillsScreen color={config.color} active={isActive} />}
+        <ScreenContent config={config} />
       </group>
 
-      {/* Marquee overlay - positioned and tilted to match the cabinet's marquee panel */}
       <group position={MARQUEE_POS} rotation={[MARQUEE_TILT, 0, 0]}>
         <MarqueeBackdrop color={config.color} />
         <Text
@@ -224,7 +157,6 @@ export function CabinetScreen({ config, isActive }: CabinetScreenProps) {
         </Text>
       </group>
 
-      {/* Controls overlay - positioned and tilted to match the cabinet's control panel surface */}
       <group position={CONTROLS_POS} rotation={[CONTROLS_TILT, 0, 0]}>
         <ControlsBackdrop color={config.color} />
       </group>
