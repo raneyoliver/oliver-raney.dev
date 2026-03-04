@@ -9,9 +9,9 @@ export function NeonLighting() {
         position={[0, 10, 0]}
       />
       <directionalLight
-        position={[0, 5, 6]}
-        intensity={1.5}
-        color="#ffffff"
+        position={[0, 8, 6]}
+        intensity={0.5}
+        color="#a434eb"
       />
       <directionalLight
         position={[3, 3, 3]}

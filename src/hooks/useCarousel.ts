@@ -61,8 +61,8 @@ export function useCarousel() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isZooming) return;
-      if (e.key === "ArrowRight" || e.key === "d") rotateNext();
-      if (e.key === "ArrowLeft" || e.key === "a") rotatePrev();
+      if (e.key === "ArrowRight" || e.key === "d") rotatePrev();
+      if (e.key === "ArrowLeft" || e.key === "a") rotateNext();
     };
 
     const handleWheel = (e: WheelEvent) => {

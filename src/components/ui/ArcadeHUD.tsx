@@ -24,21 +24,7 @@ export function ArcadeHUD({ activeCabinet, onEnter, isZooming }: ArcadeHUDProps)
         padding: "2rem",
       }}
     >
-      {/* Top: Title */}
-      <div style={{ textAlign: "center" }}>
-        <h1
-          className="font-pixel"
-          style={{
-            fontSize: "clamp(10px, 2vw, 18px)",
-            color: activeCabinet.color,
-            textShadow: `0 0 10px ${activeCabinet.color}, 0 0 20px ${activeCabinet.color}`,
-            letterSpacing: "0.15em",
-            transition: "color 0.5s, text-shadow 0.5s",
-          }}
-        >
-          {activeCabinet.title}
-        </h1>
-      </div>
+      <div />
 
       {/* Bottom: Controls hint */}
       <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
