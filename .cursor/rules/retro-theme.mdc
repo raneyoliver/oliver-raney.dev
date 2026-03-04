@@ -1,0 +1,30 @@
+---
+description: Retro arcade theme design system and styling rules
+globs: "**/*.tsx, **/*.css"
+alwaysApply: false
+---
+
+# Retro Arcade Theme
+
+## Color Palette
+- Neon cyan `#00FFFF` — primary accent, screen glow
+- Neon magenta `#FF00FF` — secondary accent
+- Electric green `#39FF14` — success/highlight
+- Amber `#FFBF00` — warnings, warm accents
+- Deep purple `#1a0033` — background base
+- Dark bg `#0a0014` — page background
+
+## Typography
+- Headings: `font-pixel` (Press Start 2P) — always uppercase
+- Body text: `font-terminal` (VT323) — larger sizes (18px+) for readability
+- Never use system fonts or modern sans-serifs
+
+## Glow Effects
+- CSS: `text-shadow` with 2-4 layers of currentColor at increasing blur
+- Three.js: `emissive` property + bloom post-processing
+- Cabinet screens should cast colored light onto surroundings
+
+## Do NOT
+- Use modern rounded corners, soft gradients, or flat design elements
+- Use smooth sans-serif fonts
+- Create static-feeling pages — always include some ambient animation

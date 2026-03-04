@@ -1,0 +1,16 @@
+---
+description: Core project conventions for the retro arcade portfolio
+alwaysApply: true
+---
+
+# Project Conventions
+
+- TypeScript strict mode, never use `any` — use `unknown` with type guards instead
+- Functional components only, always use named exports
+- File naming: PascalCase for component files, camelCase for hooks/utils
+- 3D components go in `src/components/three/`
+- UI components go in `src/components/ui/`
+- Hooks in `src/hooks/`, lib utilities in `src/lib/`
+- Use `@/*` path alias for all imports (maps to `./src/*`)
+- Client components must have `"use client"` directive at the top
+- All constants and config belong in `src/lib/` — no magic numbers in components

@@ -1,0 +1,18 @@
+---
+description: React Three Fiber and Three.js best practices
+globs: src/components/three/**/*.tsx, src/hooks/use*.ts
+alwaysApply: false
+---
+
+# React Three Fiber Patterns
+
+- Use R3F declarative JSX (`<mesh>`, `<boxGeometry>`) — avoid imperative `new THREE.Mesh()` in render
+- `useFrame` callbacks must multiply by `delta` for frame-rate independence
+- Memoize expensive geometry/material with `useMemo` — never create them inline in JSX
+- Dispose geometries and materials in cleanup (`useEffect` return) when dynamically created
+- Use `drei` helpers first: `<Html>`, `<Text>`, `<Float>`, `<RoundedBox>`, etc.
+- `<Html>` components need `transform` and `occlude` props for proper 3D integration
+- Group related meshes with `<group>` and apply transforms at the group level
+- Spring animations via `@react-spring/three` — use `animated.group` or `animated.mesh`
+- Keep the R3F `<Canvas>` in a client component; page-level components can be server components
+- Performance: use `<Instances>` for repeated geometry, limit draw calls
