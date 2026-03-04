@@ -12,8 +12,8 @@ interface CabinetScreenProps {
 }
 
 const SY = 0.37;
-const SZ = 0.62;
-const SW = 0.52;
+const SZ = 0.68;
+const SW = 0.54;
 const SH = 0.50;
 const FONT = "/fonts/PressStart2P-Regular.ttf";
 
@@ -30,11 +30,11 @@ function ScreenBackdrop({ color, isActive }: { color: string; isActive: boolean 
 
   return (
     <group>
-      <mesh position={[0, SY, SZ - 0.003]}>
+      <mesh position={[0, SY, SZ - 0.005]}>
         <planeGeometry args={[SW, SH]} />
-        <meshBasicMaterial color="#000811" />
+        <meshBasicMaterial color="#000000" />
       </mesh>
-      <mesh ref={glowRef} position={[0, SY, SZ - 0.002]}>
+      <mesh ref={glowRef} position={[0, SY, SZ - 0.003]}>
         <planeGeometry args={[SW, SH]} />
         <meshBasicMaterial color={color} transparent opacity={0.08} />
       </mesh>
@@ -153,9 +153,12 @@ export function CabinetScreen({ config, isActive }: CabinetScreenProps) {
   return (
     <group>
       <ScreenBackdrop color={config.color} isActive={isActive} />
-      <Text position={[0, SY, SZ + 0.02]} fontSize={0.06} color="#ff0000" font={FONT} anchorX="center" anchorY="middle">
-        {config.title}
-      </Text>
+      {config.id === "about" && <AboutScreen color={config.color} active={isActive} />}
+      {config.id === "projects" && <ProjectsScreen color={config.color} active={isActive} />}
+      {config.id === "resume" && <ResumeScreen color={config.color} active={isActive} />}
+      {config.id === "contact" && <ContactScreen color={config.color} active={isActive} />}
+      {config.id === "blog" && <BlogScreen color={config.color} active={isActive} />}
+      {config.id === "skills" && <SkillsScreen color={config.color} active={isActive} />}
     </group>
   );
 }

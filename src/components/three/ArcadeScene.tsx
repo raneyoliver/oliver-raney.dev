@@ -33,8 +33,8 @@ export function ArcadeScene() {
   } = useCarousel();
 
   const bind = useSwipeGesture({
-    onSwipeLeft: rotateNext,
-    onSwipeRight: rotatePrev,
+    onSwipeLeft: rotatePrev,
+    onSwipeRight: rotateNext,
   });
 
   const handleEnter = useCallback(async () => {
@@ -54,12 +54,12 @@ export function ArcadeScene() {
     <>
       <div {...bind()} style={{ width: "100vw", height: "100vh", touchAction: "none" }}>
         <Canvas
-          camera={{ position: [0, 0.3, 0], fov: 90, near: 0.1, far: 100 }}
+          camera={{ position: [0, 0.4, 0], fov: 75, near: 0.1, far: 100 }}
           gl={{ antialias: true, alpha: false }}
           dpr={tier === "low" ? [1, 1] : [1, 2]}
         >
           <color attach="background" args={["#0a0014"]} />
-          <fog attach="fog" args={["#0a0014", 8, 20]} />
+          <fog attach="fog" args={["#0a0014", 5, 15]} />
           <Suspense fallback={null}>
             <CameraController
               zoomTarget={zoomTarget}

@@ -18,11 +18,11 @@ export function CameraController({ zoomTarget, currentZoom }: CameraControllerPr
     currentZoom.current = THREE.MathUtils.lerp(currentZoom.current, zoomTarget.current, 0.06);
     const zoom = currentZoom.current;
 
-    const basePos = new THREE.Vector3(0, 0.5, 0);
-    const zoomPos = new THREE.Vector3(0, 0.5, CABINET_RADIUS * 0.6);
+    const basePos = new THREE.Vector3(0, 0.4, 0);
+    const zoomPos = new THREE.Vector3(0, 0.4, CABINET_RADIUS * 0.55);
     const targetPos = new THREE.Vector3().lerpVectors(basePos, zoomPos, zoom);
 
-    const targetLookAt = new THREE.Vector3(0, 0.3, CABINET_RADIUS);
+    const targetLookAt = new THREE.Vector3(0, 0.25, CABINET_RADIUS);
 
     currentPos.current.lerp(targetPos, 0.08);
     currentLookAt.current.lerp(targetLookAt, 0.08);

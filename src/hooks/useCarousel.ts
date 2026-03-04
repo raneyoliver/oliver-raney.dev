@@ -19,7 +19,10 @@ export function useCarousel() {
     (index: number) => {
       if (isZooming) return;
       setActiveIndex(index);
-      targetRotation.current = -index * ROTATION_STEP;
+      const newTarget = -index * ROTATION_STEP;
+      let delta = newTarget - targetRotation.current;
+      delta = ((delta % (2 * Math.PI)) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
+      targetRotation.current += delta;
     },
     [isZooming]
   );
