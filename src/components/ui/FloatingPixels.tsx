@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
 
 const PIXEL_SPRITES = ["★", "♦", "●", "▲", "♥", "✦", "◆", "✶"];
 const COLORS = ["#00FFFF", "#FF00FF", "#39FF14", "#FFBF00", "#FF6B6B", "#A855F7"];
@@ -20,8 +20,10 @@ interface FloatingPixelsProps {
 }
 
 export function FloatingPixels({ count = 15 }: FloatingPixelsProps) {
-  const particles: Particle[] = useMemo(
-    () =>
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    setParticles(
       Array.from({ length: count }, (_, i) => ({
         id: i,
         char: PIXEL_SPRITES[Math.floor(Math.random() * PIXEL_SPRITES.length)],
@@ -30,9 +32,11 @@ export function FloatingPixels({ count = 15 }: FloatingPixelsProps) {
         delay: Math.random() * 20,
         duration: 10 + Math.random() * 15,
         size: 8 + Math.random() * 14,
-      })),
-    [count]
-  );
+      }))
+    );
+  }, [count]);
+
+  if (particles.length === 0) return null;
 
   return (
     <div

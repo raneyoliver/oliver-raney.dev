@@ -3,39 +3,32 @@
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import * as THREE from "three";
-import type { SpringValue } from "@react-spring/three";
-import { CABINET_RADIUS, ROTATION_STEP } from "@/lib/theme";
+import { CABINET_RADIUS } from "@/lib/theme";
 
 interface CameraControllerProps {
-  activeIndex: number;
-  zoomProgress: SpringValue<number>;
-  ringRotation: SpringValue<number>;
+  zoomTarget: React.MutableRefObject<number>;
+  currentZoom: React.MutableRefObject<number>;
 }
 
-export function CameraController({ activeIndex, zoomProgress, ringRotation }: CameraControllerProps) {
-  const targetPos = useRef(new THREE.Vector3(0, 0.3, 0));
-  const targetLookAt = useRef(new THREE.Vector3(0, 0.3, CABINET_RADIUS));
+export function CameraController({ zoomTarget, currentZoom }: CameraControllerProps) {
+  const currentPos = useRef(new THREE.Vector3(0, 0.5, 0));
+  const currentLookAt = useRef(new THREE.Vector3(0, 0.3, CABINET_RADIUS));
 
   useFrame(({ camera }) => {
-    const zoom = zoomProgress.get();
-    const angle = activeIndex * ROTATION_STEP + ringRotation.get();
+    currentZoom.current = THREE.MathUtils.lerp(currentZoom.current, zoomTarget.current, 0.06);
+    const zoom = currentZoom.current;
 
-    const cabinetX = Math.sin(angle) * CABINET_RADIUS;
-    const cabinetZ = Math.cos(angle) * CABINET_RADIUS;
+    const basePos = new THREE.Vector3(0, 0.5, 0);
+    const zoomPos = new THREE.Vector3(0, 0.5, CABINET_RADIUS * 0.6);
+    const targetPos = new THREE.Vector3().lerpVectors(basePos, zoomPos, zoom);
 
-    const basePos = new THREE.Vector3(0, 0.3, 0);
-    const zoomPos = new THREE.Vector3(cabinetX * 0.7, 0.3, cabinetZ * 0.7);
-    targetPos.current.lerpVectors(basePos, zoomPos, zoom);
+    const targetLookAt = new THREE.Vector3(0, 0.3, CABINET_RADIUS);
 
-    const baseLook = new THREE.Vector3(
-      Math.sin(angle) * CABINET_RADIUS,
-      0.3,
-      Math.cos(angle) * CABINET_RADIUS
-    );
-    targetLookAt.current.copy(baseLook);
+    currentPos.current.lerp(targetPos, 0.08);
+    currentLookAt.current.lerp(targetLookAt, 0.08);
 
-    camera.position.lerp(targetPos.current, 0.1);
-    camera.lookAt(targetLookAt.current);
+    camera.position.copy(currentPos.current);
+    camera.lookAt(currentLookAt.current);
   });
 
   return null;

@@ -3,6 +3,7 @@
 import { ArcadeScene } from "@/components/three/ArcadeScene";
 import { ScanlineOverlay } from "@/components/ui/ScanlineOverlay";
 import { FloatingPixels } from "@/components/ui/FloatingPixels";
+import { Attribution } from "@/components/ui/Attribution";
 import { usePerformanceTier, getPixelCount } from "@/hooks/usePerformanceTier";
 
 export default function Home() {
@@ -13,6 +14,7 @@ export default function Home() {
       <ArcadeScene />
       <FloatingPixels count={getPixelCount(tier)} />
       <ScanlineOverlay />
+      <Attribution />
     </main>
   );
 }

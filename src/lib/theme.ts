@@ -11,6 +11,6 @@ export const RETRO_COLORS = {
   white: '#ffffff',
 } as const;
 
-export const CABINET_RADIUS = 4.5;
+export const CABINET_RADIUS = 2.8;
 export const CABINETS_COUNT = 6;
 export const ROTATION_STEP = (2 * Math.PI) / CABINETS_COUNT;

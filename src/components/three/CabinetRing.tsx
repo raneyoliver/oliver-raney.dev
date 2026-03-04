@@ -1,20 +1,31 @@
 "use client";
 
-import { animated } from "@react-spring/three";
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import { CABINETS } from "@/lib/cabinets";
 import { CABINET_RADIUS, ROTATION_STEP } from "@/lib/theme";
 import { ArcadeCabinet } from "./ArcadeCabinet";
-import type { SpringValue } from "@react-spring/three";
+import * as THREE from "three";
 
 interface CabinetRingProps {
-  springRotation: SpringValue<number>;
+  targetRotation: React.MutableRefObject<number>;
+  currentRotation: React.MutableRefObject<number>;
   activeIndex: number;
   onSelectCabinet: (index: number) => void;
 }
 
-export function CabinetRing({ springRotation, activeIndex, onSelectCabinet }: CabinetRingProps) {
+export function CabinetRing({ targetRotation, currentRotation, activeIndex, onSelectCabinet }: CabinetRingProps) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  useFrame(() => {
+    if (groupRef.current) {
+      currentRotation.current = THREE.MathUtils.lerp(currentRotation.current, targetRotation.current, 0.06);
+      groupRef.current.rotation.y = currentRotation.current;
+    }
+  });
+
   return (
-    <animated.group rotation-y={springRotation}>
+    <group ref={groupRef}>
       {CABINETS.map((cabinet, index) => {
         const angle = index * ROTATION_STEP;
         const x = Math.sin(angle) * CABINET_RADIUS;
@@ -35,6 +46,6 @@ export function CabinetRing({ springRotation, activeIndex, onSelectCabinet }: Ca
           </group>
         );
       })}
-    </animated.group>
+    </group>
   );
 }

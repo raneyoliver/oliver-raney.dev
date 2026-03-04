@@ -2,6 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
+import { Environment } from "@react-three/drei";
 import { useRouter } from "next/navigation";
 import { CabinetRing } from "./CabinetRing";
 import { NeonLighting } from "./NeonLighting";
@@ -19,8 +20,10 @@ export function ArcadeScene() {
   const tier = usePerformanceTier();
   const {
     activeIndex,
-    spring,
-    zoomSpring,
+    targetRotation,
+    currentRotation,
+    zoomTarget,
+    currentZoom,
     isZooming,
     rotateNext,
     rotatePrev,
@@ -51,21 +54,22 @@ export function ArcadeScene() {
     <>
       <div {...bind()} style={{ width: "100vw", height: "100vh", touchAction: "none" }}>
         <Canvas
-          camera={{ position: [0, 0.3, 0], fov: 75, near: 0.1, far: 100 }}
+          camera={{ position: [0, 0.3, 0], fov: 90, near: 0.1, far: 100 }}
           gl={{ antialias: true, alpha: false }}
           dpr={tier === "low" ? [1, 1] : [1, 2]}
         >
           <color attach="background" args={["#0a0014"]} />
-          <fog attach="fog" args={["#0a0014", 5, 15]} />
+          <fog attach="fog" args={["#0a0014", 8, 20]} />
           <Suspense fallback={null}>
             <CameraController
-              activeIndex={activeIndex}
-              zoomProgress={zoomSpring.zoom}
-              ringRotation={spring.rotation}
+              zoomTarget={zoomTarget}
+              currentZoom={currentZoom}
             />
+            <Environment preset="night" environmentIntensity={0.5} />
             <NeonLighting />
             <CabinetRing
-              springRotation={spring.rotation}
+              targetRotation={targetRotation}
+              currentRotation={currentRotation}
               activeIndex={activeIndex}
               onSelectCabinet={rotateTo}
             />

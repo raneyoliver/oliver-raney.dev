@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useSpring } from "@react-spring/three";
 import { CABINETS } from "@/lib/cabinets";
 import { ROTATION_STEP } from "@/lib/theme";
 
@@ -11,23 +10,18 @@ export function useCarousel() {
   const count = CABINETS.length;
   const wheelCooldown = useRef(false);
 
-  const [spring, api] = useSpring(() => ({
-    rotation: 0,
-    config: { mass: 2, tension: 120, friction: 30 },
-  }));
-
-  const [zoomSpring, zoomApi] = useSpring(() => ({
-    zoom: 0,
-    config: { mass: 1, tension: 100, friction: 20 },
-  }));
+  const targetRotation = useRef(0);
+  const currentRotation = useRef(0);
+  const zoomTarget = useRef(0);
+  const currentZoom = useRef(0);
 
   const rotateTo = useCallback(
     (index: number) => {
       if (isZooming) return;
       setActiveIndex(index);
-      api.start({ rotation: -index * ROTATION_STEP });
+      targetRotation.current = -index * ROTATION_STEP;
     },
-    [api, isZooming]
+    [isZooming]
   );
 
   const rotateNext = useCallback(() => {
@@ -45,18 +39,21 @@ export function useCarousel() {
   const enterCabinet = useCallback((): Promise<void> => {
     if (isZooming) return Promise.resolve();
     setIsZooming(true);
+    zoomTarget.current = 1;
     return new Promise((resolve) => {
-      zoomApi.start({
-        zoom: 1,
-        onRest: () => resolve(),
-      });
+      const check = setInterval(() => {
+        if (currentZoom.current > 0.95) {
+          clearInterval(check);
+          resolve();
+        }
+      }, 50);
     });
-  }, [isZooming, zoomApi]);
+  }, [isZooming]);
 
   const exitCabinet = useCallback(() => {
     setIsZooming(false);
-    zoomApi.start({ zoom: 0 });
-  }, [zoomApi]);
+    zoomTarget.current = 0;
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -84,8 +81,10 @@ export function useCarousel() {
 
   return {
     activeIndex,
-    spring,
-    zoomSpring,
+    targetRotation,
+    currentRotation,
+    zoomTarget,
+    currentZoom,
     isZooming,
     rotateNext,
     rotatePrev,
