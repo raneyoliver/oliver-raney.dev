@@ -26,10 +26,10 @@ const MH = 0.245;
 const FONT = "/fonts/PressStart2P-Regular.ttf";
 
 // Controls surface: position, dimensions, and tilt
-const CONTROLS_POS: [number, number, number] =  [0, 0.64, -.11];
-const CONTROLS_TILT = -0.254;
-const CW = 1.01;
-const CH = 1.096;
+const CONTROLS_POS: [number, number, number] =  [0, 0.057, .05];
+const CONTROLS_TILT = -1.404;
+const CW = 1;
+const CH = 0.9;
 
 function ScreenBackdrop({ color, isActive }: { color: string; isActive: boolean }) {
   const glowRef = useRef<THREE.Mesh>(null);
@@ -66,6 +66,21 @@ function MarqueeBackdrop({ color }: { color: string }) {
       <mesh position={[0, 0, -0.003]}>
         <planeGeometry args={[MW, MH]} />
         <meshBasicMaterial color={color} transparent opacity={0.15} />
+      </mesh>
+    </group>
+  );
+}
+
+function ControlsBackdrop({ color }: { color: string }) {
+  return (
+    <group>
+      <mesh position={[0, 0, -0.005]}>
+        <planeGeometry args={[CW, CH]} />
+        <meshBasicMaterial color="#0a080c" />
+      </mesh>
+      <mesh position={[0, 0, -0.003]}>
+        <planeGeometry args={[CW, CH]} />
+        <meshBasicMaterial color={color} transparent opacity={0.12} />
       </mesh>
     </group>
   );
@@ -206,6 +221,11 @@ export function CabinetScreen({ config, isActive }: CabinetScreenProps) {
         >
           {config.title}
         </Text>
+      </group>
+
+      {/* Controls overlay - positioned and tilted to match the cabinet's control panel surface */}
+      <group position={CONTROLS_POS} rotation={[CONTROLS_TILT, 0, 0]}>
+        <ControlsBackdrop color={config.color} />
       </group>
     </group>
   );
