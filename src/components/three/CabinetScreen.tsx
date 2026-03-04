@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Text } from "@react-three/drei";
+import { Text, useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import type { CabinetConfig } from "@/lib/cabinets";
 
@@ -14,7 +14,7 @@ interface CabinetScreenProps {
 // Screen surface: position, dimensions, and tilt (radians, negative = top tilts backward)
 const SCREEN_POS: [number, number, number] = [0, 0.64, -.11];
 const SCREEN_TILT = -0.254;
-const SW = 1.01;
+const SW = 1.005;
 const SH = 1.096;
 
 // Marquee surface: position, dimensions, and tilt
@@ -72,11 +72,12 @@ function MarqueeBackdrop({ color }: { color: string }) {
 }
 
 function ControlsBackdrop({ color }: { color: string }) {
+  const texture = useTexture("/control.webp");
   return (
     <group>
       <mesh position={[0, 0, -0.005]}>
         <planeGeometry args={[CW, CH]} />
-        <meshBasicMaterial color="#0a080c" />
+        <meshBasicMaterial map={texture} toneMapped={false} />
       </mesh>
       <mesh position={[0, 0, -0.003]}>
         <planeGeometry args={[CW, CH]} />
