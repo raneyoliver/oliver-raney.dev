@@ -114,7 +114,7 @@ function ScreenContent({ config }: { config: CabinetConfig }) {
   return (
     <Html
       transform
-      position={[0, -0.16, 0]}
+      position={[0, -0.16, 0.05]}
       scale={HTML_SCALE}
       center
       occlude

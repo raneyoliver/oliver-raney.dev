@@ -55,8 +55,8 @@ export function FreeCamController({ onExit }: FreeCamControllerProps) {
 
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
-      yaw.current -= e.movementX * LOOK_SENSITIVITY;
-      pitch.current += e.movementY * LOOK_SENSITIVITY;
+      yaw.current += e.movementX * LOOK_SENSITIVITY;
+      pitch.current -= e.movementY * LOOK_SENSITIVITY;
       pitch.current = Math.max(-Math.PI / 2 + 0.01, Math.min(Math.PI / 2 - 0.01, pitch.current));
     };
 
@@ -64,10 +64,18 @@ export function FreeCamController({ onExit }: FreeCamControllerProps) {
     return () => document.removeEventListener("mousemove", onMouseMove);
   }, []);
 
+  const lookTarget = useRef(new THREE.Vector3());
+
   useFrame(() => {
     const { w, a, s, d } = keys.current;
-    const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(-pitch.current, yaw.current, 0, "YXZ"));
-    const right = new THREE.Vector3(1, 0, 0).applyEuler(new THREE.Euler(0, yaw.current, 0, "YXZ"));
+    const p = pitch.current;
+    const y = yaw.current;
+    const cosP = Math.cos(p);
+    const sinP = Math.sin(p);
+    const cosY = Math.cos(y);
+    const sinY = Math.sin(y);
+    const forward = new THREE.Vector3(sinY * cosP, sinP, -cosY * cosP);
+    const right = new THREE.Vector3(cosY, 0, sinY);
 
     const dir = new THREE.Vector3();
     if (w) dir.add(forward);
@@ -81,9 +89,8 @@ export function FreeCamController({ onExit }: FreeCamControllerProps) {
     }
 
     camera.position.copy(position.current);
-    camera.rotation.order = "YXZ";
-    camera.rotation.y = yaw.current;
-    camera.rotation.x = -pitch.current;
+    lookTarget.current.copy(position.current).add(forward);
+    camera.lookAt(lookTarget.current);
   });
 
   return null;
