@@ -4,7 +4,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { CABINETS } from "@/lib/cabinets";
 import { ROTATION_STEP } from "@/lib/theme";
 
-export function useCarousel() {
+export function useCarousel(options?: { disableInput?: boolean }) {
+  const disableInput = options?.disableInput ?? false;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isZooming, setIsZooming] = useState(false);
   const [isZoomedIn, setIsZoomedIn] = useState(false);
@@ -18,27 +19,27 @@ export function useCarousel() {
 
   const rotateTo = useCallback(
     (index: number) => {
-      if (isZooming || isZoomedIn) return;
+      if (disableInput || isZooming || isZoomedIn) return;
       setActiveIndex(index);
       const newTarget = -index * ROTATION_STEP;
       let delta = newTarget - targetRotation.current;
       delta = ((delta % (2 * Math.PI)) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
       targetRotation.current += delta;
     },
-    [isZooming, isZoomedIn]
+    [disableInput, isZooming, isZoomedIn]
   );
 
   const rotateNext = useCallback(() => {
-    if (isZooming || isZoomedIn) return;
+    if (disableInput || isZooming || isZoomedIn) return;
     const next = (activeIndex + 1) % count;
     rotateTo(next);
-  }, [activeIndex, count, rotateTo, isZooming, isZoomedIn]);
+  }, [activeIndex, count, rotateTo, disableInput, isZooming, isZoomedIn]);
 
   const rotatePrev = useCallback(() => {
-    if (isZooming || isZoomedIn) return;
+    if (disableInput || isZooming || isZoomedIn) return;
     const prev = (activeIndex - 1 + count) % count;
     rotateTo(prev);
-  }, [activeIndex, count, rotateTo, isZooming, isZoomedIn]);
+  }, [activeIndex, count, rotateTo, disableInput, isZooming, isZoomedIn]);
 
   const enterCabinet = useCallback((): Promise<void> => {
     if (isZooming || isZoomedIn) return Promise.resolve();
@@ -63,14 +64,14 @@ export function useCarousel() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isZooming || isZoomedIn) return;
+      if (disableInput || isZooming || isZoomedIn) return;
       if (e.key === "ArrowRight" || e.key === "d") rotatePrev();
       if (e.key === "ArrowLeft" || e.key === "a") rotateNext();
     };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
-      if (isZooming || isZoomedIn || wheelCooldown.current) return;
+      if (disableInput || isZooming || isZoomedIn || wheelCooldown.current) return;
       wheelCooldown.current = true;
       setTimeout(() => { wheelCooldown.current = false; }, 400);
       if (e.deltaY > 0) rotateNext();
@@ -83,7 +84,7 @@ export function useCarousel() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("wheel", handleWheel);
     };
-  }, [rotateNext, rotatePrev, isZooming, isZoomedIn]);
+  }, [rotateNext, rotatePrev, isZooming, isZoomedIn, disableInput]);
 
   return {
     activeIndex,

@@ -17,6 +17,9 @@ interface CabinetScreenProps {
   isActive: boolean;
 }
 
+const CABINET_PX_WIDTH = 360;
+const CABINET_PX_HEIGHT = 280;
+
 const SCREEN_POS: [number, number, number] = [0, 0.64, -.11];
 const SCREEN_TILT = -0.254;
 const SW = 1.005;
@@ -38,8 +41,8 @@ const CH = 0.9;
 // A CSS pixel maps to (groupScale / factor) world units.
 // For W pixels to span SW world units: scale = SW * factor / W
 const DREI_FACTOR = 40;
-const HTML_PX_W = typeof window !== "undefined" ? window.innerWidth : 1920;
-const HTML_PX_H = typeof window !== "undefined" ? window.innerHeight : 1080;
+const HTML_PX_W = 360;
+const HTML_PX_H = Math.round(HTML_PX_W * SH / SW);
 const HTML_SCALE = (SW * DREI_FACTOR) / HTML_PX_W;
 
 function ScreenBackdrop({ color, isActive }: { color: string; isActive: boolean }) {
@@ -111,15 +114,17 @@ function ScreenContent({ config }: { config: CabinetConfig }) {
   return (
     <Html
       transform
-      position={[0, 0, 0.01]}
+      position={[0, -0.16, -0.5]}
       scale={HTML_SCALE}
       center
+      occlude
       zIndexRange={[0, 0]}
     >
       <div
+
         style={{
-          width: HTML_PX_W,
-          height: HTML_PX_H,
+          width: CABINET_PX_WIDTH,
+          height: CABINET_PX_HEIGHT,
           overflow: "hidden",
           background: "#0a0014",
           color: "#ededed",
