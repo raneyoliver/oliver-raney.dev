@@ -114,15 +114,15 @@ function ScreenContent({ config }: { config: CabinetConfig }) {
   return (
     <Html
       transform
-      position={[0, -0.16, -0.5]}
+      position={[0, -0.16, 0]}
       scale={HTML_SCALE}
       center
       occlude
       zIndexRange={[0, 0]}
     >
       <div
-
         style={{
+          position: "relative",
           width: CABINET_PX_WIDTH,
           height: CABINET_PX_HEIGHT,
           overflow: "hidden",
@@ -134,6 +134,15 @@ function ScreenContent({ config }: { config: CabinetConfig }) {
         }}
       >
         {contentMap[config.id]}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            background: "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px)",
+            zIndex: 10,
+          }}
+        />
       </div>
     </Html>
   );
