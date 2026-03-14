@@ -10,17 +10,17 @@ export function NeonLighting() {
       />
       <directionalLight
         position={[0, 8, 6]}
-        intensity={0.5}
+        intensity={1.5}
         color="#a434eb"
       />
       <directionalLight
         position={[3, 3, 3]}
-        intensity={0.5}
+        intensity={1.5}
         color="#ddccff"
       />
       <directionalLight
         position={[-3, 3, 3]}
-        intensity={0.5}
+        intensity={1.5}
         color="#ddccff"
       />
       <pointLight position={[0, 6, 0]} intensity={2.0} color="#FF00FF" distance={25} decay={2} />
