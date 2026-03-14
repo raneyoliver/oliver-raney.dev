@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SITE_CONFIG } from "@/lib/siteConfig";
 
 interface ContactContentProps {
   color: string;
@@ -50,9 +51,9 @@ export function ContactContent({ color }: ContactContentProps) {
         }}
       >
         {[
-          { label: "GITHUB", url: "#", icon: "⟨/⟩" },
-          { label: "LINKEDIN", url: "#", icon: "in" },
-          { label: "EMAIL", url: "mailto:hello@example.com", icon: "✉" },
+          { label: "GITHUB", url: SITE_CONFIG.github, icon: "⟨/⟩" },
+          { label: "LINKEDIN", url: SITE_CONFIG.linkedin, icon: "in" },
+          { label: "EMAIL", url: `mailto:${SITE_CONFIG.email}`, icon: "✉" },
         ].map((link) => (
           <a
             key={link.label}

@@ -1,41 +1,68 @@
 "use client";
 
+import { SITE_CONFIG } from "@/lib/siteConfig";
+
 interface Project {
   title: string;
   description: string;
   tech: string[];
   color: string;
   status: string;
+  url?: string;
 }
 
 const PROJECTS: Project[] = [
   {
-    title: "PROJECT ALPHA",
-    description: "A full-stack web application with real-time features and modern architecture.",
-    tech: ["React", "Node.js", "WebSocket"],
+    title: "HASHROOM – AGENTIC AI GROUP CHAT",
+    description:
+      "Mobile app featuring Model Context Protocol (MCP) support and graph memory context for agentic AI interactions. Engineered RAG systems for persistent LLM context. Expanded productivity use cases with MCP servers and fine-tuned parameters for personalized responses.",
+    tech: ["MCP Server", "LLM", "NLP", "React Native", "TypeScript"],
     color: "#FF00FF",
     status: "COMPLETE",
   },
   {
-    title: "PROJECT BETA",
-    description: "Interactive data visualization dashboard with custom charting engine.",
-    tech: ["D3.js", "TypeScript", "Python"],
+    title: "REINFORCEMENT LEARNING IN DRONE SYSTEMS",
+    description:
+      "Paper published at ICASSP: Optimized drone triangulation using Q-Learning and Neural Networks. Led research team at SMU, delegating tasks and organizing final presentation for Lyle School of Engineering staff.",
+    tech: ["Python", "Q-Learning", "Neural Networks"],
     color: "#00FFFF",
     status: "COMPLETE",
+    url: `${SITE_CONFIG.github}/CS8321Labs-public/blob/main/lab5/Emitter%20Localization%20using%20Q-Learning%20Optimized%20Sensor%20Positioning.pdf`,
   },
   {
-    title: "PROJECT GAMMA",
-    description: "Mobile-first progressive web app with offline capabilities.",
-    tech: ["Next.js", "PWA", "Tailwind"],
+    title: "MAXIMIZING NEURON ACTIVATION IN CNNS",
+    description:
+      "Analyzed CNNs to identify circuits responsible for conceptual visualization, improving model interpretability. Produced visual insights into neuron activation to showcase findings on deep learning optimization.",
+    tech: ["Python", "TensorFlow", "Scikit-learn", "Jupyter"],
     color: "#39FF14",
-    status: "IN PROGRESS",
+    status: "COMPLETE",
+    url: `${SITE_CONFIG.github}/CS8321Labs-public/blob/main/lab3/lab3.ipynb`,
   },
   {
-    title: "PROJECT DELTA",
-    description: "Machine learning pipeline with automated data processing and model training.",
-    tech: ["Python", "TensorFlow", "Docker"],
+    title: "NEURAL NETWORK FROM SCRATCH",
+    description:
+      "Built and fine-tuned a Multi-layered Perceptron (MLP) neural network, manually implementing back-propagation algorithms to deepen understanding of model architecture.",
+    tech: ["Python", "Scikit-learn", "TensorFlow"],
     color: "#FFBF00",
     status: "COMPLETE",
+  },
+  {
+    title: "FRONTEND REACT NATIVE MOBILE APP",
+    description:
+      "Designed a cross-platform fitness application for logging workouts with a focus on intuitive UI/UX. Collaborated with team to ensure seamless integration of frontend designs with backend logic.",
+    tech: ["React Native", "JavaScript", "iOS", "Android"],
+    color: "#A855F7",
+    status: "COMPLETE",
+    url: `${SITE_CONFIG.github}/fisico-frontend-mvp-public`,
+  },
+  {
+    title: "FULL-STACK WEB APPLICATION (A&M)",
+    description:
+      "Developed a full-stack tracker application for SASE at Texas A&M using Agile methodologies and daily Scrum. Managed client expectations and ensured product alignment through rigorous unit testing and continuous feedback loops.",
+    tech: ["React", "Ruby on Rails", "PostgreSQL", "Cucumber"],
+    color: "#FF6B6B",
+    status: "COMPLETE",
+    url: `${SITE_CONFIG.github}/SASE-Participation-Tracker-public`,
   },
 ];
 
@@ -88,6 +115,8 @@ export function ProjectsContent({ color }: ProjectsContentProps) {
                 justifyContent: "space-between",
                 alignItems: "flex-start",
                 marginBottom: "0.75rem",
+                flexWrap: "wrap",
+                gap: "0.5rem",
               }}
             >
               <h3
@@ -99,7 +128,28 @@ export function ProjectsContent({ color }: ProjectsContentProps) {
                   margin: 0,
                 }}
               >
-                {project.title}
+                {project.url ? (
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "inherit",
+                      textDecoration: "none",
+                      transition: "opacity 0.2s",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.opacity = "0.8";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.opacity = "1";
+                    }}
+                  >
+                    {project.title} ⟨↗⟩
+                  </a>
+                ) : (
+                  project.title
+                )}
               </h3>
               <span
                 className="font-pixel"

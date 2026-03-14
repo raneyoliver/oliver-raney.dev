@@ -16,7 +16,8 @@ const vt323 = VT323({
 
 export const metadata: Metadata = {
   title: "Oliver Raney | Retro Arcade Portfolio",
-  description: "Step into the arcade. A retro-themed portfolio showcasing projects, skills, and experience.",
+  description:
+    "Software Developer III at Paycom. M.S. in AI/ML from SMU. Full-stack web + AI solutions.",
 };
 
 export default function RootLayout({

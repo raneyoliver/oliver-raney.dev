@@ -70,8 +70,8 @@ export function useCarousel(options?: { disableInput?: boolean }) {
     };
 
     const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
       if (disableInput || isZooming || isZoomedIn || wheelCooldown.current) return;
+      e.preventDefault();
       wheelCooldown.current = true;
       setTimeout(() => { wheelCooldown.current = false; }, 400);
       if (e.deltaY > 0) rotateNext();

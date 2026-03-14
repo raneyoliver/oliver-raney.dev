@@ -10,46 +10,53 @@ interface Experience {
 
 const EXPERIENCE: Experience[] = [
   {
-    role: "SENIOR DEVELOPER",
-    company: "TECH CORP",
-    period: "2023 - PRESENT",
+    role: "SOFTWARE DEVELOPER III",
+    company: "PAYCOM | IRVING, TX",
+    period: "PRESENT",
     details: [
-      "Led development of customer-facing web applications",
-      "Architected scalable microservices infrastructure",
-      "Mentored junior developers and conducted code reviews",
+      "Core Stack: TypeScript, React, PHP, SQL, JIRA",
+      "Drive full-stack web development, implementing tangible backend upgrades that actively improve client system performance",
+      "Manage the complete software lifecycle, maintaining code quality and tracking issues via JIRA while consistently meeting team deadlines",
+      "Collaborate with cross-functional teams to deploy responsive, high-availability web solutions",
     ],
     color: "#39FF14",
   },
   {
-    role: "FULL STACK DEV",
-    company: "STARTUP INC",
-    period: "2021 - 2023",
+    role: "DATA ENGINEER",
+    company: "CAPGEMINI | DALLAS, TX",
+    period: "JUL 2021 – NOV 2022",
     details: [
-      "Built and maintained React/Node.js applications",
-      "Implemented CI/CD pipelines and automated testing",
-      "Contributed to open source projects",
+      "Core Stack: Python, SQL, Data Transformation",
+      "Engineered data accessibility solutions for Citibank, optimizing workflows to save over 6,000 minutes bi-annually",
+      "Leveraged Python and SQL to manage large-scale databases, delivering efficient and scalable data transformations",
+      "Demonstrated adaptability and strong time management by balancing multiple high-priority projects in a fast-paced corporate environment",
     ],
     color: "#00FFFF",
   },
-  {
-    role: "JUNIOR DEVELOPER",
-    company: "AGENCY CO",
-    period: "2019 - 2021",
-    details: [
-      "Developed client websites and web applications",
-      "Collaborated with design team on UI/UX",
-      "Learned modern web development practices",
-    ],
-    color: "#FF00FF",
-  },
 ];
 
-const EDUCATION = [
+interface EducationEntry {
+  degree: string;
+  school: string;
+  year: string;
+  color: string;
+  details?: string;
+}
+
+const EDUCATION: EducationEntry[] = [
+  {
+    degree: "M.S. COMPUTER SCIENCE (AI/ML SPECIALIZATION)",
+    school: "SOUTHERN METHODIST UNIVERSITY (SMU) | DALLAS, TX",
+    year: "DEC 2024",
+    details: "GPA: 3.60/4.00 · Relevant Courses: Artificial Intelligence, Machine Learning & Neural Networks, NLP, Algorithm Engineering",
+    color: "#FFBF00",
+  },
   {
     degree: "B.S. COMPUTER SCIENCE",
-    school: "UNIVERSITY",
-    year: "2019",
-    color: "#FFBF00",
+    school: "TEXAS A&M UNIVERSITY | COLLEGE STATION, TX",
+    year: "MAY 2021",
+    details: "Minors: Mathematics, Cybersecurity",
+    color: "#FF00FF",
   },
 ];
 
@@ -206,10 +213,22 @@ export function ResumeContent({ color }: ResumeContentProps) {
             </h3>
             <div
               className="font-terminal"
-              style={{ fontSize: 18, color: "#ffffff88" }}
+              style={{
+                fontSize: 18,
+                color: "#ffffff88",
+                marginBottom: edu.details ? "0.5rem" : 0,
+              }}
             >
               {edu.school} &middot; {edu.year}
             </div>
+            {edu.details ? (
+              <div
+                className="font-terminal"
+                style={{ fontSize: 14, color: "#ffffff66" }}
+              >
+                {edu.details}
+              </div>
+            ) : null}
           </div>
         ))}
       </section>

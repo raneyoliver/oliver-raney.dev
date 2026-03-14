@@ -10,29 +10,7 @@ interface BlogPost {
   tag: string;
 }
 
-const POSTS: BlogPost[] = [
-  {
-    slug: "getting-started-with-threejs",
-    title: "GETTING STARTED WITH THREE.JS",
-    date: "2026-03-01",
-    excerpt: "A beginner-friendly guide to creating 3D web experiences with Three.js and React Three Fiber.",
-    tag: "TUTORIAL",
-  },
-  {
-    slug: "retro-web-design",
-    title: "WHY RETRO WEB DESIGN HITS DIFFERENT",
-    date: "2026-02-15",
-    excerpt: "Exploring the charm of retro aesthetics in modern web development and why nostalgia works.",
-    tag: "DESIGN",
-  },
-  {
-    slug: "typescript-tips",
-    title: "TYPESCRIPT TIPS FOR BETTER DX",
-    date: "2026-01-20",
-    excerpt: "Advanced TypeScript patterns that will make your developer experience smoother.",
-    tag: "DEV",
-  },
-];
+const POSTS: BlogPost[] = [];
 
 interface BlogContentProps {
   color: string;
@@ -54,7 +32,36 @@ export function BlogContent({ color }: BlogContentProps) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        {POSTS.map((post) => (
+        {POSTS.length === 0 ? (
+          <div
+            style={{
+              background: "#000811",
+              border: `1px solid ${color}22`,
+              padding: "3rem",
+              textAlign: "center",
+            }}
+          >
+            <div style={{ fontSize: 48, marginBottom: "1rem" }}>📝</div>
+            <p
+              className="font-pixel"
+              style={{
+                fontSize: 10,
+                color: `${color}cc`,
+                textShadow: `0 0 6px ${color}`,
+                marginBottom: "0.5rem",
+              }}
+            >
+              NO POSTS YET
+            </p>
+            <p
+              className="font-terminal"
+              style={{ fontSize: 18, color: "#ffffff66" }}
+            >
+              Check back soon!
+            </p>
+          </div>
+        ) : (
+          POSTS.map((post) => (
           <Link
             key={post.slug}
             href={`/blog/${post.slug}`}
@@ -124,7 +131,8 @@ export function BlogContent({ color }: BlogContentProps) {
               </p>
             </article>
           </Link>
-        ))}
+        )))
+        }
       </div>
     </div>
   );

@@ -1,10 +1,16 @@
 "use client";
 
+import Image from "next/image";
+import { useState } from "react";
+import { SITE_CONFIG } from "@/lib/siteConfig";
+
 interface AboutContentProps {
   color: string;
 }
 
 export function AboutContent({ color }: AboutContentProps) {
+  const [avatarError, setAvatarError] = useState(false);
+
   return (
     <div style={{ maxWidth: 700, margin: "0 auto" }}>
       <div
@@ -17,18 +23,30 @@ export function AboutContent({ color }: AboutContentProps) {
       >
         <div
           style={{
-            width: 120,
-            height: 120,
+            width: 480,
+            height: 480,
             border: `2px solid ${color}`,
             boxShadow: `0 0 15px ${color}44, inset 0 0 15px ${color}11`,
             display: "flex",
-            alignItems: "center",
+            alignItems: "flex-start",
             justifyContent: "center",
             fontSize: 48,
             marginBottom: "1.5rem",
+            overflow: "hidden",
           }}
         >
-          👾
+          {!avatarError ? (
+            <Image
+              src={SITE_CONFIG.avatarPath}
+              alt={SITE_CONFIG.name}
+              width={480}
+              height={120}
+              style={{ objectFit: "cover" }}
+              onError={() => setAvatarError(true)}
+            />
+          ) : (
+            <span>👾</span>
+          )}
         </div>
         <h2
           className="font-pixel"
@@ -72,10 +90,14 @@ export function AboutContent({ color }: AboutContentProps) {
             lineHeight: 1.8,
           }}
         >
-          Welcome to my corner of the digital world. I&apos;m a developer who
-          loves building creative, interactive experiences on the web. When
-          I&apos;m not coding, you can find me exploring new technologies,
-          playing retro games, or tinkering with creative projects.
+          Software Developer III at Paycom with a Master&apos;s degree in
+          Artificial Intelligence/ML and a strong background in full-stack
+          engineering. I offer a dual competency in building scalable web
+          applications (React, TypeScript, PHP) and developing advanced AI
+          solutions (LLMs, RAG, Neural Networks). Collaborative problem-solver
+          eager to leverage expertise in machine learning and software
+          architecture to deliver innovative solutions in a challenging
+          environment.
         </p>
       </div>
 
@@ -87,10 +109,14 @@ export function AboutContent({ color }: AboutContentProps) {
         }}
       >
         {[
-          { label: "LOCATION", value: "EARTH.EXE", icon: "📍" },
+          { label: "LOCATION", value: SITE_CONFIG.location, icon: "📍" },
           { label: "STATUS", value: "ONLINE", icon: "🟢" },
-          { label: "CLASS", value: "DEVELOPER", icon: "⚔️" },
-          { label: "QUEST", value: "BUILD COOL STUFF", icon: "🎯" },
+          { label: "CLASS", value: "SOFTWARE DEVELOPER III", icon: "⚔️" },
+          {
+            label: "QUEST",
+            value: "BUILD INNOVATIVE AI & WEB SOLUTIONS",
+            icon: "🎯",
+          },
         ].map((stat) => (
           <div
             key={stat.label}
