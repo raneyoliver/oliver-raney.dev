@@ -36,11 +36,11 @@ export const CABINETS: CabinetConfig[] = [
     subtitle: 'GET IN TOUCH',
   },
   {
-    id: 'blog',
-    title: 'BLOG',
-    route: '/blog',
+    id: 'play',
+    title: 'PLAY',
+    route: '/play',
     color: '#FF6B6B',
-    subtitle: 'MY THOUGHTS',
+    subtitle: 'GENERATIVE GAME',
   },
   {
     id: 'skills',

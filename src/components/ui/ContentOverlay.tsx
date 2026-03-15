@@ -6,7 +6,6 @@ import { AboutContent } from "@/components/content/AboutContent";
 import { ProjectsContent } from "@/components/content/ProjectsContent";
 import { ResumeContent } from "@/components/content/ResumeContent";
 import { ContactContent } from "@/components/content/ContactContent";
-import { BlogContent } from "@/components/content/BlogContent";
 import { SkillsContent } from "@/components/content/SkillsContent";
 
 interface ContentOverlayProps {
@@ -19,7 +18,7 @@ const contentMap: Record<string, (color: string) => React.ReactNode> = {
   projects: (c) => <ProjectsContent color={c} />,
   resume: (c) => <ResumeContent color={c} />,
   contact: (c) => <ContactContent color={c} />,
-  blog: (c) => <BlogContent color={c} />,
+  play: () => null,
   skills: (c) => <SkillsContent color={c} />,
 };
 
@@ -103,7 +102,14 @@ export function ContentOverlay({ cabinet, onExit }: ContentOverlayProps) {
         <div style={{ width: 120 }} />
       </header>
 
-      <main style={{ padding: "2rem", maxWidth: 960, margin: "0 auto" }}>
+      <main
+        style={{
+          padding: cabinet.id === "play" ? 0 : "2rem",
+          maxWidth: cabinet.id === "play" ? "none" : 960,
+          margin: cabinet.id === "play" ? 0 : "0 auto",
+          overflow: cabinet.id === "play" ? "hidden" : undefined,
+        }}
+      >
         {contentMap[cabinet.id]?.(cabinet.color)}
       </main>
     </div>

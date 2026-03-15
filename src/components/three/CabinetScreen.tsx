@@ -9,7 +9,7 @@ import { AboutContent } from "@/components/content/AboutContent";
 import { ProjectsContent } from "@/components/content/ProjectsContent";
 import { ResumeContent } from "@/components/content/ResumeContent";
 import { ContactContent } from "@/components/content/ContactContent";
-import { BlogContent } from "@/components/content/BlogContent";
+import { PlayPreview } from "@/components/content/PlayPreview";
 import { SkillsContent } from "@/components/content/SkillsContent";
 
 interface CabinetScreenProps {
@@ -107,7 +107,7 @@ function ScreenContent({ config }: { config: CabinetConfig }) {
     projects: <ProjectsContent color={config.color} />,
     resume: <ResumeContent color={config.color} />,
     contact: <ContactContent color={config.color} />,
-    blog: <BlogContent color={config.color} />,
+    play: <PlayPreview color={config.color} />,
     skills: <SkillsContent color={config.color} />,
   };
 

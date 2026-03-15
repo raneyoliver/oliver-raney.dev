@@ -1,14 +1,14 @@
 "use client";
 
-import { PageWrapper } from "@/components/ui/PageWrapper";
-import { FloatingPixels } from "@/components/ui/FloatingPixels";
-import { BlogContent } from "@/components/content/BlogContent";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function BlogPage() {
-  return (
-    <PageWrapper title="BLOG" color="#FF6B6B">
-      <FloatingPixels />
-      <BlogContent color="#FF6B6B" />
-    </PageWrapper>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace("/play");
+  }, [router]);
+
+  return null;
 }
