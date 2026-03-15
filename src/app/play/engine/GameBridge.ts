@@ -3,7 +3,7 @@ import { ProjectileDef } from './ProjectileManager';
 export type GameKeyCallback = (pressed: boolean) => void;
 export type GameClickCallback = () => void;
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type GameFrameCallback = (state: { player: any; asteroids: any[]; projectiles: any[] }) => void;
+export type GameFrameCallback = (state: { player: any; asteroids: any[]; projectiles: any[]; game: any }) => void;
 /* eslint-enable */
 
 const BLOCKED_KEYS = new Set(['w', 'a', 's', 'd', 'escape', 'tab']);
@@ -72,7 +72,7 @@ export class GameBridge {
   }
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  triggerFrame(state: { player: any; asteroids: any[]; projectiles: any[] }) {
+  triggerFrame(state: { player: any; asteroids: any[]; projectiles: any[]; game: any }) {
     for (const cb of this.frameCallbacks) {
       try {
         cb(state);

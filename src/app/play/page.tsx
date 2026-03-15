@@ -106,7 +106,11 @@ export default function PlayPage() {
 
       if (e.key === "Tab") {
         e.preventDefault();
-        setShowInfo((prev) => !prev);
+        setShowInfo((prev) => {
+          const next = !prev;
+          engine.setInfoPanelOpen(next);
+          return next;
+        });
         return;
       }
 

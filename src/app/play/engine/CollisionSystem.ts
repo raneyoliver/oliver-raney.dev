@@ -15,7 +15,7 @@ export function computeHullFromDOM(container: HTMLElement): CollisionRect[] {
   elements.forEach(el => {
     if (el.tagName === 'STYLE' || el.tagName === 'SCRIPT') return;
     const style = window.getComputedStyle(el);
-    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return;
+    if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0' || style.pointerEvents === 'none') return;
     const r = el.getBoundingClientRect();
     if (r.width < 4 || r.height < 4) return;
     rects.push({

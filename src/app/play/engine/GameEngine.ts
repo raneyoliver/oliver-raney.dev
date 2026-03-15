@@ -40,6 +40,9 @@ export class GameEngine {
   private timeScale = 1.0;
   private timer = TIMER_DURATION;
   private score = 0;
+  private gameSpeed = 1.0;
+  private infoPanelOpen = false;
+  private tabMessageTimer = 0;
 
   private creationHull: CollisionRect[] = [];
   private particles: Particle[] = [];
@@ -100,8 +103,15 @@ export class GameEngine {
     this.timeScale = 1.0;
     this.timer = TIMER_DURATION;
     this.player.state.hasCreation = true;
+    this.player.resetHearts();
+    this.callbacks.onHeartsChange(this.player.state.hearts);
+    this.tabMessageTimer = 4.0; // Show for 4 seconds
     this.callbacks.onStateChange(this.state);
     this.callbacks.onTimerChange(this.timer);
+  }
+
+  setInfoPanelOpen(open: boolean) {
+    this.infoPanelOpen = open;
   }
 
   startLoop() {
@@ -130,9 +140,17 @@ export class GameEngine {
     this.lastTime = now;
     if (rawDt > 0.1) rawDt = 0.1;
 
+    // Apply manual slow-mo if info panel is open
+    const speedMult = this.infoPanelOpen ? 0.05 : 1.0;
+    const finalRawDt = rawDt * speedMult * this.gameSpeed;
+
     if (this.state !== 'paused' && this.state !== 'gameover') {
-      const dt = rawDt * this.timeScale;
-      this.update(dt, rawDt);
+      const dt = finalRawDt * this.timeScale;
+      this.update(dt, finalRawDt);
+    } 
+
+    if (this.tabMessageTimer > 0) {
+      this.tabMessageTimer -= rawDt;
     }
 
     this.render();
@@ -163,15 +181,54 @@ export class GameEngine {
       }
       this.callbacks.onTimerChange(this.timer);
       
-      // Call LLM hook
-      this.bridge.triggerFrame({
+      // Call LLM hook with raw mutable game state
+      const stateToPass = {
         player: {
           ...this.player.state,
           makeInvincible: (d: number) => this.player.makeInvincible(d)
         },
         asteroids: this.asteroids,
         projectiles: this.projectileManager.projectiles,
-      });
+        game: {
+          score: Math.round(this.score),
+          timer: this.timer,
+          timeScale: this.timeScale,
+          spawnInterval: this.spawnInterval,
+          gameSpeed: this.gameSpeed,
+          thrust: this.player.state.thrust,
+          maxSpeed: this.player.state.maxSpeed,
+          screenWidth: w,
+          screenHeight: h,
+        },
+      };
+
+      this.bridge.triggerFrame(stateToPass);
+
+      // Sync back any LLM mutations to internal engine state
+      const gameState = stateToPass.game;
+      if (gameState.score !== this.score) {
+        this.score = Math.round(gameState.score);
+        this.callbacks.onScoreChange(this.score);
+      }
+      if (gameState.timer !== this.timer) {
+        this.timer = gameState.timer;
+        this.callbacks.onTimerChange(this.timer);
+      }
+      if (gameState.timeScale !== this.timeScale) {
+        this.timeScale = gameState.timeScale;
+      }
+      if (gameState.spawnInterval !== this.spawnInterval) {
+        this.spawnInterval = gameState.spawnInterval;
+      }
+      if (gameState.gameSpeed !== undefined && gameState.gameSpeed !== this.gameSpeed) {
+        this.gameSpeed = gameState.gameSpeed;
+      }
+      if (gameState.thrust !== this.player.state.thrust) {
+        this.player.state.thrust = gameState.thrust;
+      }
+      if (gameState.maxSpeed !== this.player.state.maxSpeed) {
+        this.player.state.maxSpeed = gameState.maxSpeed;
+      }
 
       // Handle any LLM-triggered asteroid destructions
       for (let i = this.asteroids.length - 1; i >= 0; i--) {
@@ -201,7 +258,7 @@ export class GameEngine {
     }
 
     // Creation vs asteroid collision
-    if (this.creationHull.length > 0 && !this.player.state.invincible && this.player.state.hasCreation) {
+    if (this.creationHull.length > 0 && !this.player.state.invincible) {
       const creationHits = checkCreationVsAsteroids(
         this.creationHull, this.player.state.x, this.player.state.y,
         this.player.state.angle, this.asteroids
@@ -300,6 +357,18 @@ export class GameEngine {
       ctx.moveTo(15, 0);
       ctx.lineTo(25, 0);
       ctx.stroke();
+      ctx.restore();
+    }
+
+    // Draw "Press TAB" notification
+    if (this.tabMessageTimer > 0) {
+      ctx.save();
+      ctx.translate(this.player.state.x, this.player.state.y - 70);
+      ctx.font = 'bold 16px "Courier New", monospace';
+      ctx.textAlign = 'center';
+      const alpha = Math.abs(Math.sin(performance.now() * 0.01)); // Flash
+      ctx.fillStyle = `rgba(255, 255, 0, ${alpha})`;
+      ctx.fillText('PRESS [TAB] FOR ABILITIES', 0, 0);
       ctx.restore();
     }
   }

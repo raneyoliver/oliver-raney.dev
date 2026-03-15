@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { SYSTEM_PROMPT, SHOW_CREATION_TOOL } from '@/app/play/utils/systemPrompt';
+import { DESIGN_PROMPT, MECHANICS_PROMPT, SHOW_CREATION_TOOL } from '@/app/play/utils/systemPrompt';
 import { extractWidgetData } from '@/app/play/utils/streamParser';
 
 export const runtime = 'edge';
@@ -24,13 +24,37 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
+        // STAGE 1: Visual Design
+        const designResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://oliver-raney.dev',
+          },
+          body: JSON.stringify({
+            model: process.env.OPENROUTER_MODEL_DESIGN || process.env.OPENROUTER_MODEL,
+            messages: [
+              { role: 'system', content: DESIGN_PROMPT },
+              { role: 'user', content: prompt },
+            ],
+            stream: false,
+          }),
+        });
+
+        if (!designResponse.ok) {
+          throw new Error(`Design API error: ${designResponse.status}`);
+        }
+        const designData = await designResponse.json();
+        const designCode = designData.choices?.[0]?.message?.content || '';
+
+        // STAGE 2: Gameplay Mechanics (Streaming)
         const messages = [
-          { role: 'system', content: SYSTEM_PROMPT },
-          { role: 'user', content: prompt },
+          { role: 'system', content: MECHANICS_PROMPT },
+          { role: 'user', content: `Intent: ${prompt}\n\nVisual Design:\n${designCode}` },
         ];
 
         let continueLoop = true;
-
         while (continueLoop) {
           const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
@@ -38,10 +62,9 @@ export async function POST(req: NextRequest) {
               'Authorization': `Bearer ${apiKey}`,
               'Content-Type': 'application/json',
               'HTTP-Referer': 'https://oliver-raney.dev',
-              'X-Title': 'Play Arcade',
             },
             body: JSON.stringify({
-              model: 'nvidia/nemotron-3-super-120b-a12b:free',
+              model: process.env.OPENROUTER_MODEL_MECHANICS || process.env.OPENROUTER_MODEL,
               messages,
               tools: [SHOW_CREATION_TOOL],
               stream: true,
@@ -51,7 +74,7 @@ export async function POST(req: NextRequest) {
 
           if (!response.ok) {
             const err = await response.text();
-            controller.enqueue(encoder.encode(sse({ type: 'error', error: `API error: ${response.status} - ${err}` })));
+            controller.enqueue(encoder.encode(sse({ type: 'error', error: `Mechanics API error: ${response.status} - ${err}` })));
             controller.enqueue(encoder.encode(sse({ type: 'done' })));
             controller.close();
             return;
@@ -83,12 +106,8 @@ export async function POST(req: NextRequest) {
               const delta = parsed.choices?.[0]?.delta;
               if (!delta) continue;
 
-              // Text content
-              if (delta.content) {
-                assistantContent += delta.content;
-              }
+              if (delta.content) assistantContent += delta.content;
 
-              // Tool calls
               if (delta.tool_calls) {
                 for (const tc of delta.tool_calls) {
                   const idx = tc.index ?? 0;
@@ -101,7 +120,6 @@ export async function POST(req: NextRequest) {
                   if (tc.function?.arguments && toolCalls[idx]) {
                     toolCalls[idx].args += tc.function.arguments;
 
-                    // Live-stream show_creation HTML and instructions as they arrive
                     if (toolCalls[idx].name === 'show_creation') {
                       const data = extractWidgetData(toolCalls[idx].args);
                       const html = data.widget_code || '';
@@ -117,19 +135,14 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          // Process completed tool calls
           const completedTools = Object.values(toolCalls);
           if (completedTools.length === 0) {
             continueLoop = false;
             controller.enqueue(encoder.encode(sse({ type: 'done' })));
           } else {
-            // Build assistant message content
-            const assistantBlocks: Array<Record<string, unknown>> = [];
-            if (assistantContent) {
-              assistantBlocks.push({ type: 'text', text: assistantContent });
-            }
-
-            const toolResults: Array<Record<string, unknown>> = [];
+            const assistantBlocks: any[] = [];
+            if (assistantContent) assistantBlocks.push({ type: 'text', text: assistantContent });
+            const toolResults: any[] = [];
 
             for (const tc of completedTools) {
               assistantBlocks.push({
@@ -155,14 +168,9 @@ export async function POST(req: NextRequest) {
                 }
 
                 console.log("\n==================== LLM CREATION RESPONSE ====================");
-                if (assistantContent) {
-                  console.log("--- Thought Process / Text ---");
-                  console.log(assistantContent);
-                }
-                const scriptMatch = finalHtml.match(/<script\b[^>]*>([\s\S]*?)<\/script>/i);
-                console.log("\n--- JavaScript Mechanics ---");
-                console.log(scriptMatch ? scriptMatch[1].trim() : "(No separate script block found)");
-                console.log("\n--- Full Widget Code (args) ---");
+                console.log("--- Mechanics Phase Output ---");
+                console.log(assistantContent);
+                console.log("\n--- Full Widget Code ---");
                 console.log(tc.args);
                 console.log("===============================================================\n");
 
@@ -172,13 +180,12 @@ export async function POST(req: NextRequest) {
                   tool_use_id: tc.id,
                   content: 'Creation rendered successfully.',
                 });
+                continueLoop = false;
               }
             }
-
-            messages.push({ role: 'assistant', content: assistantBlocks as unknown as string });
-            messages.push({ role: 'user', content: toolResults as unknown as string });
+            messages.push({ role: 'assistant', content: assistantBlocks as any });
+            messages.push({ role: 'user', content: toolResults as any });
             assistantContent = '';
-            continueLoop = true;
           }
         }
       } catch (err) {

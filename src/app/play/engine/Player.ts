@@ -11,6 +11,8 @@ export interface PlayerState {
   alive: boolean;
   hasCreation: boolean;
   angularVelocity: number;
+  thrust: number;
+  maxSpeed: number;
 }
 
 const THRUST = 250;
@@ -31,6 +33,8 @@ export class Player {
       invincible: false, invincibleTimer: 0,
       alive: true, hasCreation: false,
       angularVelocity: 0,
+      thrust: THRUST,
+      maxSpeed: MAX_SPEED,
     };
   }
 
@@ -40,18 +44,18 @@ export class Player {
   }
 
   update(dt: number, w: number, h: number) {
-    if (this.keys.has('w')) this.state.vy -= THRUST * dt;
-    if (this.keys.has('s')) this.state.vy += THRUST * dt;
-    if (this.keys.has('a')) this.state.vx -= THRUST * dt;
-    if (this.keys.has('d')) this.state.vx += THRUST * dt;
+    if (this.keys.has('w')) this.state.vy -= this.state.thrust * dt;
+    if (this.keys.has('s')) this.state.vy += this.state.thrust * dt;
+    if (this.keys.has('a')) this.state.vx -= this.state.thrust * dt;
+    if (this.keys.has('d')) this.state.vx += this.state.thrust * dt;
 
     const df = Math.pow(DAMPING, dt);
     this.state.vx *= df;
     this.state.vy *= df;
 
     const speed = Math.hypot(this.state.vx, this.state.vy);
-    if (speed > MAX_SPEED) {
-      const s = MAX_SPEED / speed;
+    if (speed > this.state.maxSpeed) {
+      const s = this.state.maxSpeed / speed;
       this.state.vx *= s;
       this.state.vy *= s;
     }
@@ -101,7 +105,14 @@ export class Player {
       invincible: false, invincibleTimer: 0,
       alive: true, hasCreation: false,
       angularVelocity: 0,
+      thrust: THRUST,
+      maxSpeed: MAX_SPEED,
     };
     this.keys.clear();
+  }
+
+  resetHearts() {
+    this.state.hearts = 3;
+    this.state.alive = true;
   }
 }
